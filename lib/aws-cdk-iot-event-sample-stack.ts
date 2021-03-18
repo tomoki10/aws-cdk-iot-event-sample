@@ -69,131 +69,136 @@ export class AwsCdkIotEventSampleStack extends cdk.Stack {
       ],
     });
 
+    // HINT: Exporting the IoT Events model created in the AWS console
+    //       and using it can be implemented quickly.
+    const linedetectorModelDefinition = {
+      initialStateName: "line-initialize",
+      states: [
+        {
+          stateName: "line-initialize",
+          onInput: {
+            transitionEvents: [
+              {
+                eventName: "initialize",
+                condition: `true`,
+                actions: [
+                  // Retain the first execution time at initialization.
+                  {
+                    setVariable: {
+                      variableName: "previosLineStartTime",
+                      value: `$input.${lineInput.inputName}.lineStartTime`,
+                    },
+                  },
+                  {
+                    setVariable: {
+                      variableName: "previosLineEndTime",
+                      value: `$input.${lineInput.inputName}.lineEndTime`,
+                    },
+                  },
+                ],
+                nextState: "line-start",
+              },
+            ],
+          },
+          onExit: {
+            events: [
+              {
+                eventName: "line-initialize-event",
+                actions: [
+                  {
+                    sns: {
+                      payload: {
+                        type: "STRING",
+                        contentExpression: "'Line initialized'",
+                      },
+                      targetArn: lineNotificationTopic.topicArn,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          stateName: "line-start",
+          onInput: {
+            transitionEvents: [
+              {
+                eventName: "line-end-check",
+                nextState: "line-end",
+                condition: `$input.${lineInput.inputName}.lineEndTime !=  $variable.previosLineEndTime`,
+              },
+            ],
+          },
+          onExit: {
+            events: [
+              {
+                eventName: "line-start-event",
+                actions: [
+                  {
+                    sns: {
+                      payload: {
+                        type: "STRING",
+                        contentExpression: "'Line ended'",
+                      },
+                      targetArn: lineNotificationTopic.topicArn,
+                    },
+                  },
+                  {
+                    setVariable: {
+                      variableName: "previosLineEndTime",
+                      value: `$input.${lineInput.inputName}.lineEndTime`,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+        {
+          stateName: "line-end",
+          onInput: {
+            transitionEvents: [
+              {
+                eventName: "line-start-check",
+                nextState: "line-start",
+                condition: `$input.${lineInput.inputName}.lineStartTime !=  $variable.previosLineStartTime`,
+              },
+            ],
+          },
+          onExit: {
+            events: [
+              {
+                eventName: "line-start-event",
+                actions: [
+                  {
+                    sns: {
+                      payload: {
+                        type: "STRING",
+                        contentExpression: "'Line sterted'",
+                      },
+                      targetArn: lineNotificationTopic.topicArn,
+                    },
+                  },
+                  {
+                    setVariable: {
+                      variableName: "previosLineStartTime",
+                      value: `$input.${lineInput.inputName}.lineStartTime`,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    };
+
     // TODO: Add Model Check Process
-    // aws iotevents start-detector-model-analysis--detector -model-definition line-model
+    // aws iotevents start-detector-model-analysis --detector-model-definition line-model
+
     const lineModel = new iotEvents.CfnDetectorModel(this, "lineModel", {
-      detectorModelDefinition: {
-        initialStateName: "line-initialize",
-        states: [
-          {
-            stateName: "line-initialize",
-            onInput: {
-              transitionEvents: [
-                {
-                  eventName: "initialize",
-                  condition: `true`,
-                  actions: [
-                    // 初期化時に最初の実行時間を保持する
-                    {
-                      setVariable: {
-                        variableName: "previosLineStartTime",
-                        value: `$input.${lineInput.inputName}.lineStartTime`,
-                      },
-                    },
-                    {
-                      setVariable: {
-                        variableName: "previosLineEndTime",
-                        value: `$input.${lineInput.inputName}.lineEndTime`,
-                      },
-                    },
-                  ],
-                  nextState: "line-start",
-                },
-              ],
-            },
-            onExit: {
-              events: [
-                {
-                  eventName: "line-initialize-event",
-                  actions: [
-                    {
-                      sns: {
-                        payload: {
-                          type: "STRING",
-                          contentExpression: "'Line initialized'",
-                        },
-                        targetArn: lineNotificationTopic.topicArn,
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-          {
-            stateName: "line-start",
-            onInput: {
-              transitionEvents: [
-                {
-                  eventName: "line-end-check",
-                  nextState: "line-end",
-                  condition: `$input.${lineInput.inputName}.lineEndTime !=  $variable.previosLineEndTime`,
-                },
-              ],
-            },
-            onExit: {
-              events: [
-                {
-                  eventName: "line-start-event",
-                  actions: [
-                    {
-                      sns: {
-                        payload: {
-                          type: "STRING",
-                          contentExpression: "'Line ended'",
-                        },
-                        targetArn: lineNotificationTopic.topicArn,
-                      },
-                    },
-                    {
-                      setVariable: {
-                        variableName: "previosLineEndTime",
-                        value: `$input.${lineInput.inputName}.lineEndTime`,
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-          {
-            stateName: "line-end",
-            onInput: {
-              transitionEvents: [
-                {
-                  eventName: "line-start-check",
-                  nextState: "line-start",
-                  condition: `$input.${lineInput.inputName}.lineStartTime !=  $variable.previosLineStartTime`,
-                },
-              ],
-            },
-            onExit: {
-              events: [
-                {
-                  eventName: "line-start-event",
-                  actions: [
-                    {
-                      sns: {
-                        payload: {
-                          type: "STRING",
-                          contentExpression: "'Line sterted'",
-                        },
-                        targetArn: lineNotificationTopic.topicArn,
-                      },
-                    },
-                    {
-                      setVariable: {
-                        variableName: "previosLineStartTime",
-                        value: `$input.${lineInput.inputName}.lineStartTime`,
-                      },
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-        ],
-      },
+      detectorModelDefinition: linedetectorModelDefinition,
       detectorModelName: "line-model",
       key: "deviceId",
       evaluationMethod: "BATCH",
