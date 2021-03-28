@@ -28,6 +28,12 @@ Use the following command or other methods to setting your AWS account credentia
 
 https://github.com/remind101/assume-role
 
+Set up an email address for sending via SNS.
+
+```
+$ export SUBSCRIPTION_EMAIL=hogehoge@fugafuga
+```
+
 Deploy to the AWS account.
 
 ```
