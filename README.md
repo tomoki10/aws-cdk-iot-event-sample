@@ -24,7 +24,7 @@ Add the relevant packages with yarn.
 $ yarn
 ```
 
-Use the following command or other methods to setting your AWS acount credentials.
+Use the following command or other methods to setting your AWS account credentials.
 
 https://github.com/remind101/assume-role
 
