@@ -1,14 +1,59 @@
-# Welcome to your CDK TypeScript project!
+# AWS IoT Events sample with AWS CDK
 
-This is a blank project for TypeScript development with CDK.
+AWS IoT Events sample project with AWS CDK.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+As an example, Create a Detector Model for line start, and end.
 
-## Useful commands
+## Sample Architecture Overview
 
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+![Overview](images/overview.png)
+
+## Getting Started
+
+Please use the following command to get the code.
+
+```
+git clone https://github.com/tomoki10/aws-cdk-iot-event-sample.git
+```
+
+### Deploy
+
+Add the relevant packages with yarn.
+
+```
+$ yarn
+```
+
+Use the following command or other methods to setting your AWS acount credentials.
+
+https://github.com/remind101/assume-role
+
+Deploy to the AWS account.
+
+```
+$ yarn cdk deploy
+```
+
+### Test
+
+#### IoT Events to SNS
+
+You can send an payload to IoT Events and test its behavior with the following command.
+
+```
+aws iotevents-data batch-put-message --cli-input-json file://tests/sample-event/iot-events-test-payload.json
+```
+
+#### IoT Rule to IoT Events to SNS
+
+Execute the following command to get `<IoT Core ATS Endpoint>`.
+
+```
+$ aws iot describe-endpoint --endpoint-type iot:Data-ATS
+```
+
+You can send an payload to IoT Rule and test its behavior with the following command.
+
+```
+$ aws iot-data publish --cli-input-json file://tests/sample-event/iot-rule-test-payload.json --endpoint-url "<Your IoT Core ATS Endpoint>"
+```
