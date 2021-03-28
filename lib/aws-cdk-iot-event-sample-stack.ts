@@ -61,9 +61,6 @@ export class AwsCdkIotEventSampleStack extends cdk.Stack {
       assumedBy: new iam.ServicePrincipal("iotevents.amazonaws.com"),
       managedPolicies: [
         {
-          managedPolicyArn: "arn:aws:iam::aws:policy/AWSIoTEventsFullAccess",
-        },
-        {
           managedPolicyArn: "arn:aws:iam::aws:policy/AmazonSNSFullAccess",
         },
       ],
