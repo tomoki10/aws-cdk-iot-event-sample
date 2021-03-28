@@ -1,0 +1,9 @@
+{
+  "messages": [
+    {
+      "messageId": "001",
+      "inputName": "lineInput",
+      "payload": "{\"deviceId\": \"device001\", \"lineStartTime\":\"10:00:00\",  \"lineEndTime\":\"20:00:00\" }"
+    }
+  ]
+}

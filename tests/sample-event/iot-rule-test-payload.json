@@ -1,0 +1,5 @@
+{
+  "topic": "line/",
+  "qos": 0,
+  "payload": "{\"deviceId\": \"device001\", \"lineStartTime\":\"09:00:00\",  \"lineEndTime\":\"18:00:00\" }"
+}
