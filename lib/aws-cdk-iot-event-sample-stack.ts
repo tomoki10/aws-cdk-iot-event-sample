@@ -68,7 +68,7 @@ export class AwsCdkIotEventSampleStack extends cdk.Stack {
 
     // HINT: Exporting the IoT Events model created in the AWS console
     //       and using it can be implemented quickly.
-    const linedetectorModelDefinition = {
+    const lineDetectorModelDefinition = {
       initialStateName: "line-start",
       states: [
         {
@@ -172,7 +172,7 @@ export class AwsCdkIotEventSampleStack extends cdk.Stack {
     // aws iotevents start-detector-model-analysis --detector-model-definition line-model
 
     const lineModel = new iotEvents.CfnDetectorModel(this, "lineModel", {
-      detectorModelDefinition: linedetectorModelDefinition,
+      detectorModelDefinition: lineDetectorModelDefinition,
       detectorModelName: "line-model",
       key: "deviceId",
       evaluationMethod: "BATCH",
