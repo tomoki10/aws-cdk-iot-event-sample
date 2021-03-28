@@ -72,17 +72,16 @@ export class AwsCdkIotEventSampleStack extends cdk.Stack {
     // HINT: Exporting the IoT Events model created in the AWS console
     //       and using it can be implemented quickly.
     const linedetectorModelDefinition = {
-      initialStateName: "line-initialize",
+      initialStateName: "line-start",
       states: [
         {
-          stateName: "line-initialize",
-          onInput: {
-            transitionEvents: [
+          stateName: "line-start",
+          onEnter: {
+            events: [
               {
-                eventName: "initialize",
+                eventName: "variable-initialize",
                 condition: `true`,
                 actions: [
-                  // Retain the first execution time at initialization.
                   {
                     setVariable: {
                       variableName: "previosLineStartTime",
@@ -96,31 +95,9 @@ export class AwsCdkIotEventSampleStack extends cdk.Stack {
                     },
                   },
                 ],
-                nextState: "line-start",
               },
             ],
           },
-          onExit: {
-            events: [
-              {
-                eventName: "line-initialize-event",
-                actions: [
-                  {
-                    sns: {
-                      payload: {
-                        type: "STRING",
-                        contentExpression: "'Line initialized'",
-                      },
-                      targetArn: lineNotificationTopic.topicArn,
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        },
-        {
-          stateName: "line-start",
           onInput: {
             transitionEvents: [
               {
